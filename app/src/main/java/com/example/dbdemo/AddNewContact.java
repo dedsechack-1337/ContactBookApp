@@ -30,6 +30,7 @@ public class AddNewContact extends AppCompatActivity {
         Button saveBtn = findViewById(R.id.saveBtn);
         EditText nameEdit = findViewById(R.id.nameEdit);
         EditText numberEdit = findViewById(R.id.numberEdit);
+        //line
         saveBtn.setOnClickListener(v->{
             Contact new_contact = new Contact();
             new_contact.setName(nameEdit.getText().toString());
