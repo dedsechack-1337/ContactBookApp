@@ -3,6 +3,7 @@ package com.example.dbdemo;
 
 import static kotlinx.coroutines.flow.FlowKt.collect;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -17,7 +18,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dbdemo.adapter.RecyclerViewAdapter;
 import com.example.dbdemo.database.MyDbHandler;
 import com.example.dbdemo.model.Contact;
 
@@ -26,8 +30,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter recyclerViewAdapter;
+    private ArrayList<Contact> contactArrayList;
+    private  ArrayAdapter<String> arrayAdapter;
     MyDbHandler db = new MyDbHandler(MainActivity.this);
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        contactArrayList = new ArrayList<>();
+
+        //Fetch All Contacts from database
+        List<Contact>  contactsList = db.getAllContacts();
+        for (Contact contact : contactsList){
+            contactArrayList.add(contact);
+        }
+        recyclerViewAdapter = new RecyclerViewAdapter(MainActivity.this,contactArrayList);
+        recyclerView.setAdapter(recyclerViewAdapter);
+
+    }
+
+
+    /*
     @Override
     protected void onResume() {
         super.onResume();
@@ -61,13 +86,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+        */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.contactList), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -77,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent2 = new Intent(MainActivity.this,AddNewContact.class);
             startActivity(intent2);
         });
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //Creating the Contact Object
 
         /*
@@ -110,18 +139,18 @@ public class MainActivity extends AppCompatActivity {
         devid.setId(12);
         db.deleteContact(devid);
          */
-        ArrayList<String> arrayList = new ArrayList<>();
-        ListView contactList = findViewById(R.id.contactList);
+        contactArrayList = new ArrayList<>();
 
         //Fetch All Contacts from database
-         List<Contact>  contacts = db.getAllContacts();
-         for (Contact contact : contacts){
-             Log.d("db_tag","\n"+"Contact Name: "+contact.getName()+"\n"+"Id: "+contact.getId()+"\n"+"Phone Number: "+contact.getPhoneNumber());
-         arrayList.add(contact.getName()+"( "+contact.getPhoneNumber()+" )");
+         List<Contact>  contactsList = db.getAllContacts();
+         for (Contact contact : contactsList){
+         contactArrayList.add(contact);
          }
-        ArrayAdapter<String> arrayAdapter =  new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,arrayList);
-         // View The contact to UI
-        contactList.setAdapter(arrayAdapter);
+        recyclerViewAdapter = new RecyclerViewAdapter(MainActivity.this,contactArrayList);
+         recyclerView.setAdapter(recyclerViewAdapter);
+
+
+         /*
         contactList.setOnItemClickListener((parent,view,position,id)->{
             Contact selectedItem = contacts.get(position);
             Toast.makeText(this, "Selected:  "+selectedItem.getName(), Toast.LENGTH_SHORT).show();
@@ -135,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         });
+
+        */
+
         //get Count of all contacts
         Log.d("db_tag","You Have "+db.getContactsCount()+" Contacts");
     }
