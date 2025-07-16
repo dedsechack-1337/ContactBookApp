@@ -1,6 +1,7 @@
 package com.example.dbdemo.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dbdemo.ContactEdit;
+import com.example.dbdemo.MainActivity;
 import com.example.dbdemo.R;
 import com.example.dbdemo.model.Contact;
 
@@ -67,8 +70,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show();
+            int positon = this.getBindingAdapterPosition();
+            Contact contact = contactList.get(positon);
+            String name;
+            String number;
+            int id;
 
+            Toast.makeText(context, "Clicked-> "+ contact.getName()+"-"+contact.getPhoneNumber()+"-"+contact.getId(), Toast.LENGTH_SHORT).show();
+            name = contact.getName();
+            number = contact.getPhoneNumber();
+            id = contact.getId();
+            Intent intent = new Intent(context, ContactEdit.class);
+            intent.putExtra("name",name);
+            intent.putExtra("number",number);
+            intent.putExtra("id",id);
+            context.startActivity(intent);
         }
     }
 }
